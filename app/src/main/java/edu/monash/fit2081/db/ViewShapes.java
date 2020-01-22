@@ -7,6 +7,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Path;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -27,12 +28,11 @@ import static edu.monash.fit2081.db.provider.SchemeShapes.Shape;
  * A simple {@link Fragment} subclass.
  */
 public class ViewShapes extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-//    int dX;
+    //    int dX;
 //    int dY;
     int mLastTouchX;
     int mLastTouchY;
     ContentResolver resolver;
-
     public static CustomView customView = null;
 
 
@@ -54,23 +54,33 @@ public class ViewShapes extends Fragment implements LoaderManager.LoaderCallback
             public boolean onTouch(View v, MotionEvent ev) {
                 //Circle is the default shape if can't find the key
                 String selectedShapeDrawing = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE).getString("selectedShapeDrawing", "Circle");
-                int x = (int) ev.getX(); int y = (int) ev.getY();
+                int x = (int) ev.getX();
+                int y = (int) ev.getY();
                 int dX, dY;
 
                 int action = MotionEventCompat.getActionMasked(ev);
-                switch (action){
+                switch (action) {
                     case MotionEvent.ACTION_DOWN:
-                        mLastTouchX = x; mLastTouchY = y;
+                        mLastTouchX = x;
+                        mLastTouchY = y;
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if (selectedShapeDrawing.equals("Line")) {
+                        if (selectedShapeDrawing.equals("Freehand")) {
                             dX = 5; dY = 5;
                             storeShape("Circle", x, y, dX, dY);
                         }
                         break;
                     case MotionEvent.ACTION_UP:
-                        if (!selectedShapeDrawing.equals("Line")) {
+//                        if (!selectedShapeDrawing.equals("Line")) {
+////                            dX = Math.abs(x - mLastTouchX); dY = Math.abs(y - mLastTouchY);
+//////                            dX = x; dY = y;
+////                            storeShape(selectedShapeDrawing, mLastTouchX, mLastTouchY, dX, dY);
+////                        }
+                        if (selectedShapeDrawing.equals("Circle")) {
                             dX = Math.abs(x - mLastTouchX); dY = Math.abs(y - mLastTouchY);
+                            storeShape(selectedShapeDrawing, mLastTouchX, mLastTouchY, dX, dY);
+                        } else {
+                            dX = x; dY = y;
                             storeShape(selectedShapeDrawing, mLastTouchX, mLastTouchY, dX, dY);
                         }
                         break;
@@ -104,12 +114,12 @@ public class ViewShapes extends Fragment implements LoaderManager.LoaderCallback
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
 
         CursorLoader cursorLoader = new CursorLoader(getActivity(),
-            Shape.CONTENT_URI,
-            //VersionContract.Version.buildUri(2),
-            Shape.PROJECTION,
-            null,
-            null,
-            null
+                Shape.CONTENT_URI,
+                //VersionContract.Version.buildUri(2),
+                Shape.PROJECTION,
+                null,
+                null,
+                null
         );
         return cursorLoader;
     }
@@ -122,14 +132,14 @@ public class ViewShapes extends Fragment implements LoaderManager.LoaderCallback
             do {
 
                 shapes[i] = new ShapeValues(cursor.getString(
-                    cursor.getColumnIndex(Shape.SHAPE_TYPE)),
-                    cursor.getInt(cursor.getColumnIndex(Shape.SHAPE_X)),
-                    cursor.getInt(cursor.getColumnIndex(Shape.SHAPE_Y)),
-                    cursor.getInt(cursor.getColumnIndex(Shape.SHAPE_BORDER_THICKNESS)),
-                    cursor.getInt(cursor.getColumnIndex(Shape.SHAPE_RADIUS)),
-                    cursor.getInt(cursor.getColumnIndex(Shape.SHAPE_WIDTH)),
-                    cursor.getInt(cursor.getColumnIndex(Shape.SHAPE_HEIGHT)),
-                    cursor.getString(cursor.getColumnIndex(Shape.SHAPE_COLOR))
+                        cursor.getColumnIndex(Shape.SHAPE_TYPE)),
+                        cursor.getInt(cursor.getColumnIndex(Shape.SHAPE_X)),
+                        cursor.getInt(cursor.getColumnIndex(Shape.SHAPE_Y)),
+                        cursor.getInt(cursor.getColumnIndex(Shape.SHAPE_BORDER_THICKNESS)),
+                        cursor.getInt(cursor.getColumnIndex(Shape.SHAPE_RADIUS)),
+                        cursor.getInt(cursor.getColumnIndex(Shape.SHAPE_WIDTH)),
+                        cursor.getInt(cursor.getColumnIndex(Shape.SHAPE_HEIGHT)),
+                        cursor.getString(cursor.getColumnIndex(Shape.SHAPE_COLOR))
                 );
                 i++;
                 // do what ever you want here
